@@ -14,6 +14,7 @@ using Interface;
 namespace MainApp
 {
 
+    
     public partial class Form1 : Form, IMainApp
     {
         Dictionary<string, IPlugin> plugins = new Dictionary<string, IPlugin>();
@@ -28,8 +29,80 @@ namespace MainApp
                 pictureBox.Image = value;
             }
         }
-        private void FindPlugins(object sender, EventArgs e)
+        //public void FindPlugins()
+        //{
+        //    AppDomain pliginsDomain = AppDomain.CreateDomain("Plagins domain");
+        //    // папка с плагинами
+        //    string folder = AppDomain.CurrentDomain.BaseDirectory;
+
+        //    // dll-файлы в этой папке
+        //    string[] files = Directory.GetFiles(folder, "*.dll");
+
+        //    foreach (string file in files)
+        //        try
+        //        {
+        //            //  pliginsDomain.Load(AssemblyName.GetAssemblyName(file)).GetTypes;// .LoadFile(file);
+
+        //            // pliginsDomain.c
+        //            //pliginsDomain.DoCallBack(() => Assembly.LoadFile(file));
+        //            pliginsDomain.ExecuteAssembly("PlugIn.dll");
+
+        //            foreach (Type type in pliginsDomain.GetAssemblies().Last().GetTypes())
+        //            {
+        //                Type iface = type.GetInterface("Interface.IPlugin");
+
+        //                if (iface != null)
+        //                {
+        //                    // MainApp.vshost.exe
+                            
+        //                    IPlugin plugin = (IPlugin)Activator.CreateInstance(type);
+        //                    plugins.Add(plugin.Name, plugin);
+        //                }
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show("Ошибка загрузки плагина\n" + ex.Message);
+        //        }
+        //    AppDomain.Unload(pliginsDomain);
+        //}
+        void CreatePluginsMenu()
         {
+            foreach (string name in plugins.Keys)
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(name);
+                item.Click += OnPluginClick;
+                фильтрыToolStripMenuItem.DropDownItems.Add(item);
+            }
+        }
+
+        private void OnPluginClick(object sender, EventArgs args)
+        {
+            Interface.IPlugin plugin = (Interface.IPlugin)plugins[((ToolStripMenuItem)sender).Text];
+            plugin.Transform(this);
+        }
+
+        public Form1()
+        {
+            AppDomain pliginsDomain = AppDomain.CreateDomain("Plagins domain");
+
+            InitializeComponent();
+            var resident = (Find)pliginsDomain.CreateInstanceAndUnwrap(
+                    Assembly.GetExecutingAssembly().FullName,
+                    "MainApp.Find");
+            plugins = resident.FindPlugins();
+            AppDomain.Unload(pliginsDomain);
+            CreatePluginsMenu();
+
+            //FindPlugins();
+
+        }
+    }
+    public class Find : MarshalByRefObject
+    {
+        public Dictionary<string, IPlugin> FindPlugins()
+        {
+            Dictionary<string, IPlugin> plugins = new Dictionary<string, IPlugin>();
             // папка с плагинами
             string folder = System.AppDomain.CurrentDomain.BaseDirectory;
 
@@ -56,31 +129,7 @@ namespace MainApp
                 {
                     MessageBox.Show("Ошибка загрузки плагина\n" + ex.Message);
                 }
-            
-        }
-        void CreatePluginsMenu()
-        {
-            foreach (string name in plugins.Keys)
-            {
-                ToolStripMenuItem item = new ToolStripMenuItem(name);
-                item.Click += OnPluginClick;
-                фильтрыToolStripMenuItem.DropDownItems.Add(item);
-            }
-        }
-
-        private void OnPluginClick(object sender, EventArgs args)
-        {
-            Interface.IPlugin plugin = (Interface.IPlugin)plugins[((ToolStripMenuItem)sender).Text];
-            plugin.Transform(this);
-        }
-
-        public Form1()
-        {
-            InitializeComponent();
-            AppDomain pliginsDomain = AppDomain.CreateDomain("Plagins domain");
-            pliginsDomain.DomainUnload += FindPlugins;
-            AppDomain.Unload(pliginsDomain);
-            CreatePluginsMenu();
+            return plugins;
         }
     }
 }

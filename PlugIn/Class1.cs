@@ -8,7 +8,8 @@ using System.Drawing;
 
 namespace PlugIn
 {
-    public class ReverseTransform : Interface.IPlugin
+    [Serializable]
+    public class ReverseTransform :  Interface.IPlugin
     {
         public string Name
         {
@@ -49,6 +50,8 @@ namespace PlugIn
             app.Image = bitmap;
         }
     }
+    [Serializable]
+
     public class RandomTransform : Interface.IPlugin
     {
         public string Name
@@ -87,6 +90,8 @@ namespace PlugIn
             app.Image = bitmap;
         }
     }
+    [Serializable]
+
     public class Zerkalka : Interface.IPlugin
     {
         public string Name
@@ -127,6 +132,8 @@ namespace PlugIn
             app.Image = bitmap;
         }
     }
+    [Serializable]
+
     public class ReversZerk : Interface.IPlugin
     {
         public string Name
@@ -167,6 +174,7 @@ namespace PlugIn
             app.Image = bitmap;
         }
     }
+    [Serializable]
     public class PolnoeZerkalnoe : Interface.IPlugin
     {
         public string Name
@@ -207,6 +215,7 @@ namespace PlugIn
             app.Image = newbitmap;
         }
     }
+    [Serializable]
     public class Ungle90 : Interface.IPlugin
     {
         public string Name
